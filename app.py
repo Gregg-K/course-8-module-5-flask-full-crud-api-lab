@@ -21,15 +21,16 @@ events = [
 # Create a new event from JSON input
 @app.route("/events", methods=["POST"])
 def create_event():
-    # TODO: Task 2 - Design and Develop the Code
+    data = request.get_json()
+ 
+    # Task 3 - Use the data to create a new Event object
+    new_event = Event(data["id"], data["title"])
+    events.append(new_event)  # Add it to our in-memory list
+ 
+    # Task 4 - Return the new event with status 201 (Created)
+    return jsonify(new_event.to_dict()), 201
 
-    # TODO: Task 3 - Implement the Loop and Process Each Element
 
-    # TODO: Task 4 - Return and Handle Results
-    pass
-
-# TODO: Task 1 - Define the Problem
-# Update the title of an existing event
 @app.route("/events/<int:event_id>", methods=["PATCH"])
 def update_event(event_id):
     # TODO: Task 2 - Design and Develop the Code

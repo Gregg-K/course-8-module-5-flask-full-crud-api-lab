@@ -33,12 +33,20 @@ def create_event():
 
 @app.route("/events/<int:event_id>", methods=["PATCH"])
 def update_event(event_id):
-    # TODO: Task 2 - Design and Develop the Code
+    # Task 2 - Get the JSON data sent by the client
+    data = request.get_json()
+ 
+    # Task 3 - Loop through events to find the matching one
+    for event in events:
+        if event.id == event_id:
+            event.title = data["title"]  # Update the title
+ 
+            # Task 4 - Return the updated event with status 200 (OK)
+            return jsonify(event.to_dict()), 200
+ 
+    # Task 4 - If no event was found, return a 404 error
+    return jsonify({"error": "Event not found"}), 404
 
-    # TODO: Task 3 - Implement the Loop and Process Each Element
-
-    # TODO: Task 4 - Return and Handle Results
-    pass
 
 # TODO: Task 1 - Define the Problem
 # Remove an event from the list

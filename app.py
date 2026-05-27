@@ -27,7 +27,7 @@ def find_event_by_id(event_id):
 
 @app.route("/")
 def index():
-    return jsonify({"message": "Welcome to the Events API"})
+    return jsonify({"message": "Welcome to the Events API"}), 200
 
 
 @app.route("/events", methods=["GET"])
@@ -37,13 +37,10 @@ def get_events():
 
 @app.route("/events", methods=["POST"])
 def create_event():
-    data = request.get_json()
+    data = request.get_json(silent=True)
 
-    if not data or "title" not in data:
-        return jsonify({"error": "Missing required field: 'title'"}), 400
-
-    if not data["title"].strip():
-        return jsonify({"error": "Title cannot be empty"}), 400
+    if not data or "title" not in data or not str(data["title"]).strip():
+        return jsonify({"error": "title is required"}), 400
 
     new_id = max(event.id for event in events) + 1 if events else 1
     new_event = Event(new_id, data["title"])
@@ -54,13 +51,10 @@ def create_event():
 
 @app.route("/events/<int:event_id>", methods=["PATCH"])
 def update_event(event_id):
-    data = request.get_json()
+    data = request.get_json(silent=True)
 
-    if not data or "title" not in data:
-        return jsonify({"error": "Missing required field: 'title'"}), 400
-
-    if not data["title"].strip():
-        return jsonify({"error": "Title cannot be empty"}), 400
+    if not data or "title" not in data or not str(data["title"]).strip():
+        return jsonify({"error": "title is required"}), 400
 
     event = find_event_by_id(event_id)
 

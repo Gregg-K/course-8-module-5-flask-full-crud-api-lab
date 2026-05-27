@@ -25,17 +25,28 @@ def find_event_by_id(event_id):
     return None
 
 
+@app.route("/")
+def index():
+    return jsonify({"message": "Welcome to the Events API"})
+
+
+@app.route("/events", methods=["GET"])
+def get_events():
+    return jsonify([event.to_dict() for event in events]), 200
+
+
 @app.route("/events", methods=["POST"])
 def create_event():
     data = request.get_json()
 
-    if not data or "id" not in data or "title" not in data:
-        return jsonify({"error": "Missing required fields: 'id' and 'title'"}), 400
+    if not data or "title" not in data:
+        return jsonify({"error": "Missing required field: 'title'"}), 400
 
     if not data["title"].strip():
         return jsonify({"error": "Title cannot be empty"}), 400
 
-    new_event = Event(data["id"], data["title"])
+    new_id = max(event.id for event in events) + 1 if events else 1
+    new_event = Event(new_id, data["title"])
     events.append(new_event)
 
     return jsonify(new_event.to_dict()), 201

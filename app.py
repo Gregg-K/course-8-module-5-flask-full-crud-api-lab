@@ -48,16 +48,19 @@ def update_event(event_id):
     return jsonify({"error": "Event not found"}), 404
 
 
-# TODO: Task 1 - Define the Problem
-# Remove an event from the list
+
 @app.route("/events/<int:event_id>", methods=["DELETE"])
 def delete_event(event_id):
-    # TODO: Task 2 - Design and Develop the Code
-
-    # TODO: Task 3 - Implement the Loop and Process Each Element
-
-    # TODO: Task 4 - Return and Handle Results
-    pass
-
+   # Task 2 - We'll use a loop to find the event index
+    # Task 3 - Loop through events to find the matching one
+    for index, event in enumerate(events):
+        if event.id == event_id:
+            events.pop(index)  # Remove it from the list
+ 
+            # Task 4 - Return a success message with status 200 (OK)
+            return jsonify({"message": f"Event {event_id} deleted successfully"}), 200
+ 
+    # Task 4 - If no event was found, return a 404 error
+    return jsonify({"error": "Event not found"}), 404
 if __name__ == "__main__":
     app.run(debug=True)

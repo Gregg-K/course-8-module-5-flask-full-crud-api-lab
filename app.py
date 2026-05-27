@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-# Simulated data
+
 class Event:
     def __init__(self, id, title):
         self.id = id
@@ -11,56 +11,65 @@ class Event:
     def to_dict(self):
         return {"id": self.id, "title": self.title}
 
-# In-memory "database"
+
 events = [
     Event(1, "Tech Meetup"),
     Event(2, "Python Workshop")
 ]
 
-# TODO: Task 1 - Define the Problem
-# Create a new event from JSON input
+
+def find_event_by_id(event_id):
+    for event in events:
+        if event.id == event_id:
+            return event
+    return None
+
+
 @app.route("/events", methods=["POST"])
 def create_event():
     data = request.get_json()
- 
-    # Task 3 - Use the data to create a new Event object
+
+    if not data or "id" not in data or "title" not in data:
+        return jsonify({"error": "Missing required fields: 'id' and 'title'"}), 400
+
+    if not data["title"].strip():
+        return jsonify({"error": "Title cannot be empty"}), 400
+
     new_event = Event(data["id"], data["title"])
-    events.append(new_event)  # Add it to our in-memory list
- 
-    # Task 4 - Return the new event with status 201 (Created)
+    events.append(new_event)
+
     return jsonify(new_event.to_dict()), 201
 
 
 @app.route("/events/<int:event_id>", methods=["PATCH"])
 def update_event(event_id):
-    # Task 2 - Get the JSON data sent by the client
     data = request.get_json()
- 
-    # Task 3 - Loop through events to find the matching one
-    for event in events:
-        if event.id == event_id:
-            event.title = data["title"]  # Update the title
- 
-            # Task 4 - Return the updated event with status 200 (OK)
-            return jsonify(event.to_dict()), 200
- 
-    # Task 4 - If no event was found, return a 404 error
-    return jsonify({"error": "Event not found"}), 404
 
+    if not data or "title" not in data:
+        return jsonify({"error": "Missing required field: 'title'"}), 400
+
+    if not data["title"].strip():
+        return jsonify({"error": "Title cannot be empty"}), 400
+
+    event = find_event_by_id(event_id)
+
+    if event is None:
+        return jsonify({"error": f"Event with id {event_id} not found"}), 404
+
+    event.title = data["title"]
+    return jsonify(event.to_dict()), 200
 
 
 @app.route("/events/<int:event_id>", methods=["DELETE"])
 def delete_event(event_id):
-   # Task 2 - We'll use a loop to find the event index
-    # Task 3 - Loop through events to find the matching one
-    for index, event in enumerate(events):
-        if event.id == event_id:
-            events.pop(index)  # Remove it from the list
- 
-            # Task 4 - Return a success message with status 200 (OK)
-            return jsonify({"message": f"Event {event_id} deleted successfully"}), 200
- 
-    # Task 4 - If no event was found, return a 404 error
-    return jsonify({"error": "Event not found"}), 404
+    event = find_event_by_id(event_id)
+
+    if event is None:
+        return jsonify({"error": f"Event with id {event_id} not found"}), 404
+
+    events.remove(event)
+    return jsonify({"message": f"Event {event_id} deleted successfully"}), 200
+
+
 if __name__ == "__main__":
     app.run(debug=True)
